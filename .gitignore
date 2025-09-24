@@ -1,0 +1,63 @@
+# Archivos de compilación
+**/build/
+**/.gradle/
+**/captures/
+**/.externalNativeBuild/
+
+# Archivos generados por Android Studio
+**/.idea/
+**/*.iml
+**/*.ipr
+**/*.iws
+
+# Archivos de configuración local
+**/local.properties
+
+# Archivos de sistema
+**/.DS_Store
+**/Thumbs.db
+
+# Archivos de log
+**/*.log
+
+# Archivos de caché de lint y otras herramientas
+**/.lint/
+**/lint-report.html
+**/lint-results.xml
+**/lint-results.txt
+
+# Archivos de distribución
+**/*.apk
+**/*.ap_
+**/*.aab
+
+# Gradle
+**/.gradle/
+**/build/
+
+# Archivos de respaldo
+**/*.swp
+**/*.swo
+**/*~
+
+# Configuración de firma
+**/keystore.properties
+
+# NDK
+**/.cxx/
+
+# Archivos de auto guardado de Android Studio
+**/.idea/*/shelf/
+
+# Node (si usas React Native o alguna librería JS)
+**/node_modules/
+**/npm-debug.log
+**/yarn-error.log
+
+# Mac OS
+**/.DS_Store
+
+# Windows
+**/Thumbs.db
+**/ehthumbs.db
+**/Desktop.ini
