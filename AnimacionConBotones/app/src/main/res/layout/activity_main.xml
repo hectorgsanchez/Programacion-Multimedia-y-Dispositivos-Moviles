@@ -8,24 +8,37 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/texto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/texto"
-        android:text="probando el text view"
-        android:textColor="#CDDC39"
-        android:textStyle="bold"
-        android:textSize="12sp"
-        android:typeface="monospace"
+        android:text="Animacion en TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/boton1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Botón 1" />
+        android:text="Translate"
+        tools:layout_editor_absoluteX="156dp"
+        tools:layout_editor_absoluteY="440dp" />
+
+    <Button
+        android:id="@+id/boton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rotate"
+        tools:layout_editor_absoluteX="156dp"
+        tools:layout_editor_absoluteY="505dp" />
+
+    <Button
+        android:id="@+id/boton3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Detener"
+        tools:layout_editor_absoluteX="156dp"
+        tools:layout_editor_absoluteY="570dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

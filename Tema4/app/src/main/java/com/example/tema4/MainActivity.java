@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -31,17 +33,15 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     protected void onStart(){
         super.onStart();
-        TextView miTexto = findViewById(R.id.texto);
-        miTexto.setText("Nuevo texto a mostrar");
-        miTexto.setTextColor(Color.parseColor("#0000FF"));
-        miTexto.setTextColor(Color.RED);
-        miTexto.setTypeface(null, Typeface.ITALIC);
-        miTexto.setTextSize(24);
-        miTexto.setTypeface(Typeface.SANS_SERIF);
-        Animation miAnimacion = AnimationUtils.loadAnimation(this,R.anim.animacion);
-        miAnimacion.setRepeatMode(Animation.RESTART);
-        miAnimacion.setRepeatCount(20);
-        miTexto.startAnimation(miAnimacion);
+        Button boton1 = findViewById(R.id.button1);
+        TextView texto = findViewById(R.id.texto);
+        boton1.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                texto.setText("Se ha pulsado el boton");
+            }
+        }
+        );
     }
 
 
