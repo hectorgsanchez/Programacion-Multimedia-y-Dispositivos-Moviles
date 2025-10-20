@@ -11,10 +11,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Calculadora básica en Android
+ */
 public class MainActivity extends AppCompatActivity {
 
     private TextView pantalla;
-    private String entrada = "";
+    private String entrada = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         configurarBotonesEspeciales();
     }
 
-    /** Configura los botones del 0 al 9. */
     private void configurarBotonesNumericos() {
         int[] botonesNumericos = {
                 R.id.btn0, R.id.btn1, R.id.btn2, R.id.btn3,
@@ -61,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Configura los botones de operaciones y la coma. */
     private void configurarBotonesOperaciones() {
         int[] botonesOperaciones = {
                 R.id.btnAdd, R.id.btnSub, R.id.btnMul, R.id.btnDiv
@@ -81,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
             findViewById(id).setOnClickListener(listener);
         }
 
-        // Botón coma
         findViewById(R.id.btnComma).setOnClickListener(v -> {
             if (!ultimoNumeroTieneComa()) {
                 if (entrada.isEmpty() || terminaConOperador()) {
@@ -93,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Botón igual = calcular resultado
         findViewById(R.id.btnEq).setOnClickListener(v -> {
             if (!terminaConOperador() && !entrada.isEmpty()) {
                 String resultado = calcularResultado(entrada);
@@ -103,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /** Configura los botones C (borrar último) y AC (borrar todo). */
     private void configurarBotonesEspeciales() {
         findViewById(R.id.btnAC).setOnClickListener(v -> {
             entrada = "0";
@@ -119,13 +120,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /** Verifica si la entrada termina con un operador. */
     private boolean terminaConOperador() {
         return entrada.endsWith("+") || entrada.endsWith("−")
                 || entrada.endsWith("×") || entrada.endsWith("÷");
     }
 
-    /** Verifica si el último número tiene coma. */
     private boolean ultimoNumeroTieneComa() {
         int ultimaOperacion = Math.max(
                 Math.max(entrada.lastIndexOf("+"), entrada.lastIndexOf("−")),
@@ -135,18 +134,16 @@ public class MainActivity extends AppCompatActivity {
         return ultimoNumero.contains(",");
     }
 
-    /** Calcula operaciones básicas sin librerías externas. */
     private String calcularResultado(String expr) {
         try {
-            // Reemplazar símbolos
             expr = expr.replace(",", ".")
                     .replace("×", "*")
                     .replace("÷", "/")
                     .replace("−", "-");
 
             double resultado = evaluar(expr);
-            // Quitar .0 si es entero
             String textoResultado = String.valueOf(resultado);
+
             if (textoResultado.endsWith(".0")) {
                 textoResultado = textoResultado.substring(0, textoResultado.length() - 2);
             }
@@ -156,42 +153,80 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** Metodo que evalúa operaciones básicas +, -, *, / sin usar librerías. */
-    private double evaluar(String expr) {
-        // Quita espacios
+    /**
+     * Evaluación robusta:
+     * - Tokeniza números y operadores
+     * - Aplica * y / primero (izquierda -> derecha)
+     * - Luego suma y resta (izquierda -> derecha)
+     * - Maneja unary minus (ej. -5+3)
+     */
+    private double evaluar(String expr) throws Exception {
         expr = expr.replace(" ", "");
+        if (expr.isEmpty()) return 0;
 
-        // Maneja multiplicación y división primero
-        double resultado = 0;
-        char operadorActual = '+';
-        double numeroActual = 0;
+        List<Double> nums = new ArrayList<>();
+        List<Character> ops = new ArrayList<>();
+
         int i = 0;
-
         while (i < expr.length()) {
             char c = expr.charAt(i);
 
-            if (Character.isDigit(c) || c == '.') {
-                StringBuilder numero = new StringBuilder();
+            // Si es un operador (y no es signo de número), lo añadimos
+            if ((c == '+' || c == '-' || c == '*' || c == '/') && !(c == '-' && (i == 0 || "+-*/".indexOf(expr.charAt(i - 1)) != -1))) {
+                ops.add(c);
+                i++;
+            } else {
+                // Es parte de un número (puede tener signo inicial)
+                StringBuilder sb = new StringBuilder();
+                if (c == '+' || c == '-') { // signo del número
+                    sb.append(c);
+                    i++;
+                    if (i >= expr.length()) throw new Exception("Expresión inválida");
+                }
+                // tomar dígitos y punto decimal
                 while (i < expr.length() && (Character.isDigit(expr.charAt(i)) || expr.charAt(i) == '.')) {
-                    numero.append(expr.charAt(i));
+                    sb.append(expr.charAt(i));
                     i++;
                 }
-                numeroActual = Double.parseDouble(numero.toString());
-                i--; // retrocede una posición
+                String numStr = sb.toString();
+                if (numStr.equals("+") || numStr.equals("-") || numStr.isEmpty()) throw new Exception("Número inválido");
+                double valor = Double.parseDouble(numStr);
+                nums.add(valor);
             }
+        }
 
-            if (!Character.isDigit(c) || i == expr.length() - 1) {
-                switch (operadorActual) {
-                    case '+': resultado += numeroActual; break;
-                    case '-': resultado -= numeroActual; break;
-                    case '*': resultado *= numeroActual; break;
-                    case '/': resultado /= numeroActual; break;
+        if (nums.size() == 0) throw new Exception("Sin números");
+
+        // Primera pasada: resolver * y / (izquierda a derecha)
+        List<Double> nums2 = new ArrayList<>();
+        List<Character> ops2 = new ArrayList<>();
+
+        nums2.add(nums.get(0));
+        for (int j = 0; j < ops.size(); j++) {
+            char op = ops.get(j);
+            double next = nums.get(j + 1);
+
+            if (op == '*' || op == '/') {
+                double last = nums2.remove(nums2.size() - 1);
+                if (op == '*') {
+                    nums2.add(last * next);
+                } else {
+                    if (next == 0) throw new ArithmeticException("División por cero");
+                    nums2.add(last / next);
                 }
-                operadorActual = c;
-                numeroActual = 0;
+            } else {
+                ops2.add(op);
+                nums2.add(next);
             }
+        }
 
-            i++;
+        // Segunda pasada: sumar/restar (izquierda a derecha)
+        double resultado = nums2.get(0);
+        for (int j = 0; j < ops2.size(); j++) {
+            char op = ops2.get(j);
+            double val = nums2.get(j + 1);
+            if (op == '+') resultado += val;
+            else resultado -= val;
         }
 
         return resultado;
