@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,5 +38,19 @@ public class MainActivity extends AppCompatActivity {
         Adaptador miAdaptador = new Adaptador(this,datos);
         listado.setAdapter(miAdaptador);
 
+        View miCabecera = getLayoutInflater().inflate(R.layout.cabecera,null);
+        listado.addHeaderView(miCabecera);
+
+        listado.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = ((Datos)parent.getItemAtPosition(position)).getTexto1();
+                Toast.makeText(MainActivity.this, "Elemento pulsado: " + selectedItem, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
+
+
 }
