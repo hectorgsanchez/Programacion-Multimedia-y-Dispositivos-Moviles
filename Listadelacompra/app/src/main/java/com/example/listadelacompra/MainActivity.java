@@ -26,9 +26,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Item> itemList = new ArrayList<>();
     ShoppingListAdapter adapter;
 
-    // Opción sencilla: nombres en el spinner
+    // Opciones del spinner (nombres)
     String[] nombres = {"Manzana", "Banana", "Pan"};
 
+    // Imágenes correspondientes a los nombres
     int[] imageIds = {
             R.drawable.apple,
             R.drawable.banana,
@@ -46,21 +47,34 @@ public class MainActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAdd);
         spinner = findViewById(R.id.spinnerImages);
 
-        // Spinner sencillo (solo nombres)
+        // Adaptador del Spinner (sencillo)
         ArrayAdapter<String> spinnerAdapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
 
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
 
+        // Cuando selecciono un elemento → se escribe automáticamente en el EditText
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                etName.setText(nombres[position]);  // Auto-relleno
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         adapter = new ShoppingListAdapter(this, itemList);
         listView.setAdapter(adapter);
 
+        // Activar menú contextual
         registerForContextMenu(listView);
 
         btnAdd.setOnClickListener(v -> addItem());
     }
 
+    // Añadir item a la lista
     private void addItem() {
         String name = etName.getText().toString();
         String qtyStr = etQuantity.getText().toString();
@@ -69,16 +83,18 @@ public class MainActivity extends AppCompatActivity {
 
         int qty = Integer.parseInt(qtyStr);
 
-        // La imagen corresponde a la posición del spinner
+        // Imagen según la posición del spinner
         int image = imageIds[spinner.getSelectedItemPosition()];
 
+        // Crear item y añadirlo
         itemList.add(new Item(name, qty, image));
         adapter.notifyDataSetChanged();
 
-        etName.setText("");
+        // Limpiar los campos
         etQuantity.setText("");
     }
 
+    // Crear menú contextual
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -90,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         menu.add(0, 2, 0, "Eliminar");
     }
 
+    // Opciones del menú contextual
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
 
