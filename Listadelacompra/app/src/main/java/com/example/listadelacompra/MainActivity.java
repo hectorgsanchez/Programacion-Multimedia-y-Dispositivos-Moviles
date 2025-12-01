@@ -5,7 +5,6 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,10 +25,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Item> itemList = new ArrayList<>();
     ShoppingListAdapter adapter;
 
-    // Opciones del spinner (nombres)
+    // Nombres según las imágenes
     String[] nombres = {"Manzana", "Banana", "Pan"};
 
-    // Imágenes correspondientes a los nombres
+    // Imágenes para el Spinner
     int[] imageIds = {
             R.drawable.apple,
             R.drawable.banana,
@@ -47,18 +46,17 @@ public class MainActivity extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAdd);
         spinner = findViewById(R.id.spinnerImages);
 
-        // Adaptador del Spinner (sencillo)
-        ArrayAdapter<String> spinnerAdapter =
-                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombres);
+        // Adaptador del Spinner con imágenes
+        ImageSpinnerAdapter spinnerAdapter =
+                new ImageSpinnerAdapter(this, imageIds);
 
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerAdapter);
 
-        // Cuando selecciono un elemento → se escribe automáticamente en el EditText
+        // AUTOCOMPLETAR nombre según imagen seleccionada
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                etName.setText(nombres[position]);  // Auto-relleno
+                etName.setText(nombres[position]);
             }
 
             @Override
@@ -68,33 +66,26 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ShoppingListAdapter(this, itemList);
         listView.setAdapter(adapter);
 
-        // Activar menú contextual
         registerForContextMenu(listView);
 
         btnAdd.setOnClickListener(v -> addItem());
     }
 
-    // Añadir item a la lista
     private void addItem() {
         String name = etName.getText().toString();
         String qtyStr = etQuantity.getText().toString();
 
-        if (name.isEmpty() || qtyStr.isEmpty()) return;
+        if(name.isEmpty() || qtyStr.isEmpty()) return;
 
         int qty = Integer.parseInt(qtyStr);
-
-        // Imagen según la posición del spinner
         int image = imageIds[spinner.getSelectedItemPosition()];
 
-        // Crear item y añadirlo
         itemList.add(new Item(name, qty, image));
         adapter.notifyDataSetChanged();
 
-        // Limpiar los campos
         etQuantity.setText("");
     }
 
-    // Crear menú contextual
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -102,25 +93,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         menu.setHeaderTitle("Opciones");
-        menu.add(0, 1, 0, "Añadir");
-        menu.add(0, 2, 0, "Eliminar");
+        menu.add(0,1,0,"Añadir");
+        menu.add(0,2,0,"Eliminar");
     }
 
-    // Opciones del menú contextual
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
 
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        switch (item.getItemId()) {
-            case 1: // añadir uno más
+        switch(item.getItemId()) {
+            case 1:
                 Item it = itemList.get(info.position);
                 it.setQuantity(it.getQuantity() + 1);
                 adapter.notifyDataSetChanged();
                 return true;
 
-            case 2: // eliminar
+            case 2:
                 itemList.remove(info.position);
                 adapter.notifyDataSetChanged();
                 return true;
