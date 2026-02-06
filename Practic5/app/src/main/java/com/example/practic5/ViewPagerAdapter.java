@@ -35,7 +35,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0: return "Formulario";
-            case 1: return "Lista";
+            case 1: return "Calculadora";
             case 2: return "Info";
             default: return null;
         }
